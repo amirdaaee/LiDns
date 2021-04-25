@@ -9,7 +9,6 @@ import time
 from LiDns import Handlers, Resolvers, Inquirer
 
 
-
 def main():
     logger = logging.getLogger('server')
     parser = argparse.ArgumentParser(description='Start a smart DNS proxy implemented in Python')
@@ -18,23 +17,24 @@ def main():
     parser.add_argument('--bind_port', default=5053, type=int, help='The port to listen on. default:5053',
                         metavar='port')
     parser.add_argument('--dns_ip', default='8.8.8.8', type=str,
-                        help='ip of the upstream dns server to resolve real ip (default:8.8.8.8)', metavar='ip')
+                        help='ip of the upstream dns server to resolve queries (default:8.8.8.8)', metavar='ip')
     parser.add_argument('--dns_port', default='53', type=int,
-                        help='port of the upstream dns server to resolve real ip (default:53)', metavar='port')
-    parser.add_argument('--smart', help='smart mode', action='store_true')
+                        help='port of the upstream dns server to resolve queries (default:53)', metavar='port')
+    parser.add_argument('--smart', help='start in smart mode, otherwise it will start as a simple proxy dns server',
+                        action='store_true')
     parser.add_argument('--redis_uri', help='redis standard uri (smart mode)', type=str, metavar='uri')
     parser.add_argument('--sni_ip', help='sni proxy ip (smart mode)', type=str, metavar='ip')
-    parser.add_argument('--aggressive', help='resolve to sni if query in not cached yet (smart mode)',
+    parser.add_argument('--aggressive', help='resolve to sni proxy ip if query domain in not inquired yet (smart mode)',
                         action='store_true')
-    parser.add_argument('--sni_ttl', help='ttl[s] for sni ip answers (smart mode) (default=24h)', default=60 * 60 * 24,
-                        type=int, metavar='int')
-    parser.add_argument('--inquiry_ttl', help='ttl[s] for uncached query answers (smart mode) (default=1s)',
+    parser.add_argument('--sni_ttl', help='response ttl[seconds] for sni ip (smart mode) (default=24h)',
+                        default=60 * 60 * 24, type=int, metavar='int')
+    parser.add_argument('--inquiry_ttl', help='response ttl[s] for not inquired domains (smart mode) (default=1s)',
                         default=1, type=int, metavar='int')
-    parser.add_argument('--no_inquirer', help='number of inquirers in loop (smart mode) (default=2)',
+    parser.add_argument('--no_inquirer', help='number of inquirer workers in asyncio loop (smart mode) (default=2)',
                         default=2, type=int, metavar='int')
-    parser.add_argument('--log', help='log level (default:INFO)', choices=['DEBUG', 'INFO', 'WARNING'],default='INFO')
+    parser.add_argument('--log', help='log level (default:INFO)', choices=['DEBUG', 'INFO', 'WARNING'], default='INFO')
     args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging,args.log), format='[%(levelname)s] %(name)s:\t%(message)s [%(asctime)s]')
+    logging.basicConfig(level=getattr(logging, args.log), format='[%(levelname)s] %(name)s:\t%(message)s [%(asctime)s]')
     if args.smart:
         assert args.redis_uri, 'redis_uri should be provided in smart mode'
         assert args.sni_ip, 'sni_ip should be provided in smart mode'
