@@ -59,12 +59,13 @@ def main():
                                            aggressive=args.aggressive,
                                            sni_ttl=args.sni_ttl,
                                            inquiry_ttl=args.inquiry_ttl)
+        for _ in range(args.no_inquirer):
+            loop.create_task(Inquirer.Inquirer(args.redis_uri, loop=loop).start())
+            time.sleep(0.1)
     else:
         resolver = Resolvers.SimpleResolver(args.dns_ip, args.dns_port)
     Handlers.UdpDnsServer.start_server(args.bind_ip, args.bind_port, resolver=resolver, loop=loop)
-    for _ in range(args.no_inquirer):
-        loop.create_task(Inquirer.Inquirer(args.redis_uri, loop=loop).start())
-        time.sleep(0.1)
+
     try:
         loop.run_forever()
     except KeyboardInterrupt:

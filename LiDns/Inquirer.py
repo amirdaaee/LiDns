@@ -47,12 +47,12 @@ class Inquirer:
                     if status == 'direct':
                         await self.redis_client.sadd(self.DIRECT_KEY, query)
                         self.logger.info(f'added {query} to direct set {self.DIRECT_KEY}')
-                    else:
+                    elif status == 'proxy':
                         await self.redis_client.sadd(self.PROXY_KEY, query)
                         self.logger.info(f'added {query} to proxy set {self.PROXY_KEY}')
-        except web.HTTPException:
+        except:
             self.logger.error(f'error getting {schema_}{url}', stack_info=True)
-            if not schema:
+            if schema is None:
                 self.logger.debug(f'inquiring http://{url} because of error in https:// inquiring')
                 await self.inquire(query, 'http://')
 
