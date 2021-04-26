@@ -7,6 +7,7 @@ RUN set -x \
     && apk del --no-cache --purge build-deps
 
 FROM env as server
-COPY . .
+COPY ./LiDns ./LiDns
+COPY start.sh server.py ./
 RUN chmod +x ./start.sh
 CMD ./start.sh
