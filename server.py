@@ -30,8 +30,8 @@ def main():
                         default=60 * 60 * 24, type=int, metavar='int')
     parser.add_argument('--inquiry_ttl', help='response ttl[s] for not inquired domains (smart mode) (default=1s)',
                         default=1, type=int, metavar='int')
-    parser.add_argument('--no_inquirer', help='number of inquirer workers in asyncio loop (smart mode) (default=2)',
-                        default=2, type=int, metavar='int')
+    parser.add_argument('--no_inquirer', help='number of inquirer workers in asyncio loop (smart mode) (default=5)',
+                        default=5, type=int, metavar='int')
     parser.add_argument('--log', help='log level (default:INFO)', choices=['DEBUG', 'INFO', 'WARNING'], default='INFO')
     args = parser.parse_args()
     logging.basicConfig(level=getattr(logging, args.log), format='[%(levelname)s] %(name)s:\t%(message)s [%(asctime)s]')
