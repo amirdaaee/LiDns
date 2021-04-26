@@ -1,0 +1,54 @@
+version: "3"
+services:
+  lidns:
+    image: amirdaaee/lidns:latest
+    container_name: lidns
+    hostname: lidns
+    networks:
+      default:
+        ipv4_address: 172.20.1.2
+    environment:
+      - BIND_IP=0.0.0.0
+      - SMART_MODE=yes
+      - REDIS_URI=redis://redis:6379
+      - SNI_IP=172.20.1.3   #replace with sni proxy external ip
+      - AGGRESSIVE_MODE=yes
+    restart: unless-stopped
+
+  sniproxy:
+    image: amirdaaee/sni-ssl-proxy:latest
+    container_name: sniproxy
+    hostname: sniproxy
+    networks:
+      default:
+        ipv4_address: 172.20.1.3
+    expose:
+      - 80
+      - 443
+      - 993
+      - 996
+      - 465
+      - 587
+    environment:
+      - BIND_ADDRESS=0.0.0.0
+      - WORKERS_NO=1
+      - USE_TOR=yes
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    hostname: redis
+    expose:
+      - 6379
+    command: redis-server --appendonly yes
+    volumes:
+      - ./redis-data:/data
+    restart: unless-stopped
+
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.20.1.0/24
